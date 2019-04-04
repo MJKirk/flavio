@@ -55,7 +55,13 @@ def cvll_d(par, meson, scale=160):
     charm-, and charm-top-contribution to the Wilson coefficient. This
     separation is necessary as they run differently.
     """
-    mt = flavio.physics.running.running.get_mt(par, scale)
+    # Hack to use a specific mt(mt) for S0(xt) rather than mt(160)
+    # Since we fix the mt value we lose a little uncertainty but it is small,
+    # see e.g. Table II in arXiv:1712.06572.
+    if flavio.config["Bmixing scale"]["use mtmt"]:
+        mt = flavio.config["Bmixing scale"]["mtmt"]
+    else:
+        mt = flavio.physics.running.running.get_mt(par, scale)
     mc = flavio.physics.running.running.get_mc(par, scale)
     mu = flavio.physics.running.running.get_mu(par, scale)
     mW = par['m_W']

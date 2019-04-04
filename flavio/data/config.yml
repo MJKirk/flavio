@@ -11,6 +11,12 @@
 #
 #    flavio.config['CKM matrix'] = 'Wolfenstein'
 
+# personal settings
+Bmixing scale:
+    use mtmt: False
+    mtmt: 165.65
+
+
 # technical settings
 settings:
     # set the cache size for memoization. A larger number will result in more
