@@ -52,6 +52,26 @@ class Citations:
                 f.write(citation_text)
 
 
+class ParameterCitationsAwareDict(dict):
+    """Generalization of dictionary that adds the INSPIRE reference of 
+    a Parameter to the global citations list upon that parameter being
+    accessed."""
+
+    def __init__(self, d):
+        """Initialize the instance."""
+        super().__init__(d)
+        self.d = d
+
+    def __getitem__(self, key):
+        """Get an item, adding the appropriate INSPIRE key to the
+        global citations list."""
+        try:
+            flavio.citations.register(flavio.Parameter[key].inspire)
+        except AttributeError:
+            pass
+        return dict.__getitem__(self, key)
+
+
 def print_citations(filename=None):
     "See `flavio.citations.print`"
     return flavio.citations.print(filename)

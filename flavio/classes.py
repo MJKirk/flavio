@@ -15,6 +15,7 @@ import inspect
 import urllib.parse
 import re
 import pkgutil
+from .citations import ParameterCitationsAwareDict
 
 
 class NamedInstanceMetaclass(type):
@@ -221,7 +222,7 @@ class Constraints(object):
 
     def get_central_all(self):
         """Get central values of all constrained parameters."""
-        return {parameter: self.get_central(parameter) for parameter in self._parameters.keys()}
+        return ParameterCitationsAwareDict({parameter: self.get_central(parameter) for parameter in self._parameters.keys()})
 
     def get_random_all(self, size=None):
         """Get random values for all constrained parameters where they are

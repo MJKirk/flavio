@@ -3,6 +3,7 @@
 GF:
   tex: $G_F$
   description: Fermi constant
+  inspire: PDG:2020
 alpha_e:
   tex: $\alpha_e(m_Z)$
   description: electromagnetic fine structure constant in the $\overline{\text{MS}}$ scheme at the scale $m_Z$

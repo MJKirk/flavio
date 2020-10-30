@@ -20,6 +20,8 @@ def _read_yaml_object_metadata(obj, constraints):
             p.description = info['description']
         if 'tex' in info and info['tex'] is not None:
             p.tex = info['tex']
+        if 'inspire' in info and info['inspire'] is not None:
+            p.inspire = info['inspire']
 
 def read_file_metadata(filename, constraints):
     """Read parameter values from a YAML file."""
