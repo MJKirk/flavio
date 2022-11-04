@@ -11220,6 +11220,28 @@ PDG 2018 D->Plnu:
     BR(D+->Kenu): (8.73 ± 0.10) 1e-2
     BR(D+->Kmunu): (8.74 ± 0.19) 1e-2
 
+PDG 2020 D->lnu:
+  inspire: ParticleDataGroup:2020ssz
+  values:
+    BR(D+->enu): < 8.8e-6 @ 90% CL
+    BR(D+->munu): (3.74 ± 0.17) 1e-4
+    BR(D+->taunu): (1.20 ± 0.27) 1e-3
+    BR(Ds->enu): < 8.3e-5 @ 90% CL
+    BR(Ds->munu): (5.43 ± 0.15) 1e-3
+    BR(Ds->taunu): (5.32 ± 0.11) 1e-2
+
+PDG 2020 D->Plnu:
+  inspire: ParticleDataGroup:2020ssz
+  values:
+    BR(D0->pienu): (2.91 ± 0.04) 1e-3
+    BR(D0->pimunu): (2.67 ± 0.12) 1e-3
+    BR(D0->Kenu): (3.549 ± 0.026) 1e-2
+    BR(D0->Kmunu): (3.41 ± 0.04) 1e-2
+    BR(D+->pienu): (3.72 ± 0.17) 1e-3
+    BR(D+->pimunu): (3.50 ± 0.15) 1e-3
+    BR(D+->Kenu): (8.72 ± 0.09) 1e-2
+    BR(D+->Kmunu): (8.76 ± 0.19) 1e-2
+    
 BESIII D0->Kenu 2015:
   observables:
   - name: <BR>(D0->Kenu)
