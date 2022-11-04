@@ -302,7 +302,7 @@ M12_D a_bs: 0 ± 0.1
 M12_D a_ss: 0 ± 0.1
 Gamma12_D a_bb: 0
 Gamma12_D a_bs: 0 ± 0.35
-Gamma12_D a_ss: 0 ± 0.1
+Gamma12_D a_ss: -0.35 ± 0.1
 
 # Parameters for neutron EDM
 # taken from 1308.6493, eq. (22), e~1/3
