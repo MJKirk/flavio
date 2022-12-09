@@ -11128,12 +11128,16 @@ Neutron averages GACS 2018 1:
   inspire: Gonzalez-Alonso:2018omy
   description: Averages in table 7 of the paper by Gonzalez-Alonso et al.
   values:
-    - name: tau_n
-      me_E: 0.655
-      value: 1.3366(12) 1e+27 # 879.75(76) s
     - name: Btilde_n
       me_E: 0.591
       value: 0.9805(30)
+
+Neutron lifetime UCNtau 2021:
+  inspire: UCNt:2021pcg
+  values:
+    - name: tau_n
+      me_E: 0.655
+      value: (1.3335 +-0.0004 +0.0003-0.0002)1e27 # 877.75 +-0.28 +0.22-0.16 s
 
 Neutron A parameter PERKEO II 2012:
   inspire: Mund:2012fq
