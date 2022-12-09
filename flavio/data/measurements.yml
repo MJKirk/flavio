@@ -4073,11 +4073,21 @@ PDG 2020:
     Remu(K+->lnu): 2.488±0.009e-5
     BR(KL->pimunu): (27.04±0.07)1e-2
     BR(KL->pienu): (40.55±0.11)1e-2
-    BR(KS->pimunu): (4.56±0.20)1e-4
-    BR(KS->pienu): (7.04±0.08)1e-4
     BR(K+->pimunu): (3.352±0.033)1e-2
     BR(K+->pienu): (5.07±0.04)1e-2
     Gamma(pi+->munu): (2.52809±0.00050)1e-17
+
+KLOE-2 KS->pimunu 2019:
+  experiment: KLOE-2
+  inspire: KLOE-2:2019rev
+  values:
+    BR(KS->pimunu): (4.56±0.20)1e-4
+
+KLOE-2 KS->piennu 2022:
+  experiment: KLOE-2
+  inspire: KLOE-2:2022dot
+  values:
+    BR(KS->pienu): (7.153±0.057)1e-4
 
 PiENu pi->enu 2015:
   experiment: PiENu
@@ -7281,11 +7291,11 @@ K+->pinunu E949 2009:
   values:
     BR(K+->pinunu): 1.73 + 1.15 - 1.05 e-10
 
-K+->pinunu NA62 2019:
+K+->pinunu NA62 2021:
   experiment: NA62
-  url: https://indico.cern.ch/event/846814/attachments/1903630/3161337/CERN_seminar_23_09_2019.pdf
+  inspire: NA62:2021zjw
   values:
-    BR(K+->pinunu): 0.47 + 0.72 - 0.47 e-10
+    BR(K+->pinunu): 10.6 + 4.1 - 3.5 e-11
 
 KL->pinunu KOTO 2018:
   experiment: KOTO
