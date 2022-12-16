@@ -190,8 +190,8 @@ K->pi f+(0): 0.9698(17)            # FLAG 2021 Nf=2+1+1 average
 K->pi fT(0): 0.417(15)             # 1108.1021
 K->pi sT: 1.10(14)                 #  "
 K->pi delta_K+pi0: 0.0252(11)      # 2208.11707, in text of sec. 2
-K->pi ln(C): 0.1998(138)           # 1602.04113
-K->pi Lambda_+: 24.22(1.16) 1e-3   #  "
+K->pi ln(C): 0.1992(78)            # Moulson CKM 2021 talk
+K->pi Lambda_+: 25.55(38) 1e-3     #  "
 K->pi D: 0.0209(21)                # 0903.1654 table 1
 K->pi d: 0.0398(44)                #  "
 K->pi k: 0.0045(4)                 #  "
