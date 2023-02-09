@@ -14,6 +14,7 @@ from . import wdecays
 from . import zdecays
 from . import higgs
 from . import scattering
+from . import parityviolation
 from . import running
 from . import eft
 from . import units
