@@ -13997,3 +13997,23 @@ LEP ee->WW angular:
       thetamin: 0.8
       thetamax: 1.0
       value: 7.584 ± 0.26
+
+Q_weak 2018:
+  experiment: Qweak
+  inspire: Qweak:2018tjf
+  values:
+    - name: Q_W
+      Z: 1
+      N: 0
+      value: 0.0719(45)
+
+# From review "Electroweak Model and Constraints on New Physics"
+PDG QW 133Cs:
+  experiment: PDG
+  inspire: ParticleDataGroup:2022pth
+  values:
+    - name: Q_W
+      Z: 55
+      N: 78
+      value: -72.82(26)(33)
+      
