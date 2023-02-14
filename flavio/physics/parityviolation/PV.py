@@ -22,21 +22,32 @@ def Q_W(wc_obj, par, Z, N):
     Vud = 0.97
     Vus = 0.2
 
+    # C1q is WC in L = GF/sqrt2 (q gam^mu q) (e gam^mu gam^5 e) lagrangian
+    # In 1303.5522, L = (-2 / v^2) * g^eq_AV (e gam^5 gam^mu e)/2 (q gam^mu q)/2
+    # => C1q = g^eq_AV
     C1uNP = -0.5 * (Vud**2 * (phiq3_11 - phiq1_11) + 2*Vud*Vus*(phiq3_12 - phiq1_12) + Vus**2*(phiq3_22 - phiq1_22) - phiu_11)
     C1dNP = 0.5 * ((phiq3_11 + phiq1_11) + phid_11)
 
+    # Leading order SM contribution
+    # C1u = -1/2 + 4/3 sW^2
+    # C1d = 1/2 - 2/3 sW^2
+    # shifts in eqs 106 onwards I think
     C1uSM, C1dSM = -0.1888, 0.3419
 
     C1u = C1uSM + C1uNP
     C1d = C1dSM + C1dNP
 
     alphaEM = par["alpha_e"]
-    EM_correction = (1 - alphaEM/ (2 * pi))
+    EM_correction = 1 - alphaEM/(2*pi)
 
+    # Come from gamma-Z box results in Phys. Rev. Lett. 109, 262301 (2012), arXiv:1208.4310
+    # See eq 116 of 1303.5522
     Z_correction =0.00005
     N_correction = 0.00006
 
-    theory = -2*( Z*(2*C1u+C1d+Z_correction)+N*(C1u+2*C1d+N_correction)) * EM_correction
+    # See eq 96, 97 in 1303.5522, or eq 3.12 in 2107.13569
+    theory = -2*( Z * (2*C1u +  C1d + Z_correction)
+                 +N * (  C1u +2*C1d + N_correction)) * EM_correction
 
     return theory
 
