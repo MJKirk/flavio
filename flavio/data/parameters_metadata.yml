@@ -945,7 +945,7 @@ Lambdab->Lambda(1520) hTperpPrim A:
 
 
 
-# Meson bag parameters
+# Meson mixing bag parameters
 
 # SM operator
 # for the bag parameters of the SM operator OVLL,
@@ -1132,6 +1132,37 @@ DeltaGamma/Gamma_Bs:
 tau_Bc_SM:
   tex: $\tau_{B_c}^\text{SM}$
   description: Standard Model prediction for the $B_c$ lifetime
+
+
+# Meson lifetime bag parameters
+
+# Provided by Maria-Laura Piscopo, result from Table 7 of 2208.02643, run up from 1.5 GeV to 4.5 GeV
+bag_lifetime_B1qtilde:
+  tex: $$
+  description: Bag parameter of the $\tilde{O}_1^q$ operator at 4.5 GeV
+bag_lifetime_B2qtilde:
+  tex: $$
+  description: Bag parameter of the $\tilde{O}_2^q$ operator at 4.5 GeV
+bag_lifetime_B3qtilde:
+  tex: $$
+  description: Bag parameter of the $\tilde{O}_3^q$ operator at 4.5 GeV
+bag_lifetime_B4qtilde:
+  tex: $$
+  description: Bag parameter of the $\tilde{O}_4^q$ operator at 4.5 GeV
+bag_lifetime_deltaqq1tilde:
+  tex: $$
+  description: Eye-contraction parameter of the operator $\tilde{O}_1^q$ at 4.5 GeV
+bag_lifetime_deltaqq2tilde:
+  tex: $$
+  description: Eye-contraction parameter of the operator $\tilde{O}_2^q$ at 4.5 GeV
+bag_lifetime_deltaqq3tilde:
+  tex: $$
+  description: Eye-contraction parameter of the operator $\tilde{O}_3^q$ at 4.5 GeV
+bag_lifetime_deltaqq4tilde:
+  tex: $$
+  description: Eye-contraction parameter of the operator $\tilde{O}_4^q$ at 4.5 GeV
+
+
 
 # Parameters for B->D* form factors in the CLN parametrization
 B->D* CLN rho2:
