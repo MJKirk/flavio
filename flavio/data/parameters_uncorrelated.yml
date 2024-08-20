@@ -174,14 +174,19 @@ DeltaGamma/Gamma_Bs: 0.129(9) # HFAG Summer 2016
 # Meson lifetime bag parameters
 
 # Result from Table 7 of 2208.02643, run up from 1.5 GeV to 4.5 GeV as provided by Maria-Laura Piscopo
-bag_lifetime_B1qtilde: 1.0081
-bag_lifetime_B2qtilde: 1.0012
-bag_lifetime_B3qtilde: -0.047754
-bag_lifetime_B4qtilde: -0.0343363
-bag_lifetime_deltaqq1tilde: 0.0026
-bag_lifetime_deltaqq2tilde: -0.0018
-bag_lifetime_deltaqq3tilde: -0.0004
-bag_lifetime_deltaqq4tilde: 0.0003
+# Errors are currently made up, must be updated !!!
+bag_lifetime_B1qtilde: 1.0081 +- 0.1
+bag_lifetime_B2qtilde: 1.0012 +- 0.1
+bag_lifetime_B3qtilde: -0.047754 +- 0.1
+bag_lifetime_B4qtilde: -0.0343363 +- 0.1
+bag_lifetime_B5qtilde: -1 +- 0.1
+bag_lifetime_B6qtilde: -1 +- 0.1
+bag_lifetime_B7qtilde: 0 +- 0.1
+bag_lifetime_B8qtilde: 0 +- 0.1
+bag_lifetime_deltaqq1tilde: 0.0026 +- 0.001
+bag_lifetime_deltaqq2tilde: -0.0018 +- 0.001
+bag_lifetime_deltaqq3tilde: -0.0004 +- 0.001
+bag_lifetime_deltaqq4tilde: 0.0003 +- 0.001
 
 
 # B->D* form factors

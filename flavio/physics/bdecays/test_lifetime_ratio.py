@@ -1,10 +1,34 @@
 import unittest
 import flavio
+import flavio.physics
 
 
 par = flavio.default_parameters.get_central_all()
 
+wc_sm = flavio.WilsonCoefficients()
 
 class TestTauBpoBd(unittest.TestCase):
     def test_sm(self):
-        self.assertAlmostEqual(flavio.sm_prediction('tau_B+/tau_Bd'), 1.08, delta=0.05)
+        self.assertAlmostEqual(flavio.sm_prediction('tau_B+/tau_Bd'), 1.08, delta=0.01)
+
+    def test_WE_cu(self):
+        self.assertEqual(flavio.physics.bdecays.lifetime_ratio.weak_exchange(wc_sm, par, "B0"), 0)
+
+        wc = flavio.WilsonCoefficients()
+        wc.set_initial({"CVLL_bcud": 1}, scale=4.5)
+        self.assertAlmostEqual(1e15*flavio.physics.bdecays.lifetime_ratio.weak_exchange(wc, par, "B0"), 3.0363176, places=5)
+
+        wc = flavio.WilsonCoefficients()
+        wc.set_initial({"CVLLt_bcud": 1}, scale=4.5)
+        self.assertAlmostEqual(1e15*flavio.physics.bdecays.lifetime_ratio.weak_exchange(wc, par, "B0"), 9.7913797, places=5)
+
+    def test_PI_cd(self):
+        self.assertEqual(flavio.physics.bdecays.lifetime_ratio.pauli_interference(wc_sm, par, "B+"), 0)
+
+        wc = flavio.WilsonCoefficients()
+        wc.set_initial({"CVLL_bcud": 1}, scale=4.5)
+        self.assertAlmostEqual(1e14*flavio.physics.bdecays.lifetime_ratio.pauli_interference(wc, par, "B+"), 2.8241635, places=5)
+
+        wc = flavio.WilsonCoefficients()
+        wc.set_initial({"CVLLt_bcud": 1}, scale=4.5)
+        self.assertAlmostEqual(1e13*flavio.physics.bdecays.lifetime_ratio.pauli_interference(wc, par, "B+"), 1.3876961, places=5)

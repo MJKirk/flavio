@@ -1136,7 +1136,7 @@ tau_Bc_SM:
 
 # Meson lifetime bag parameters
 
-# Provided by Maria-Laura Piscopo, result from Table 7 of 2208.02643, run up from 1.5 GeV to 4.5 GeV
+# As defined in 2211.02724, eqs 2.16 - 2.19
 bag_lifetime_B1qtilde:
   tex: $$
   description: Bag parameter of the $\tilde{O}_1^q$ operator at 4.5 GeV
@@ -1149,6 +1149,18 @@ bag_lifetime_B3qtilde:
 bag_lifetime_B4qtilde:
   tex: $$
   description: Bag parameter of the $\tilde{O}_4^q$ operator at 4.5 GeV
+bag_lifetime_B5qtilde:
+  tex: $$
+  description: Bag parameter of the $\tilde{O}_5^q$ operator at 4.5 GeV
+bag_lifetime_B6qtilde:
+  tex: $$
+  description: Bag parameter of the $\tilde{O}_6^q$ operator at 4.5 GeV
+bag_lifetime_B7qtilde:
+  tex: $$
+  description: Bag parameter of the $\tilde{O}_7^q$ operator at 4.5 GeV
+bag_lifetime_B8qtilde:
+  tex: $$
+  description: Bag parameter of the $\tilde{O}_8^q$ operator at 4.5 GeV
 bag_lifetime_deltaqq1tilde:
   tex: $$
   description: Eye-contraction parameter of the operator $\tilde{O}_1^q$ at 4.5 GeV
