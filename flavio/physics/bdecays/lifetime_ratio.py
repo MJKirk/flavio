@@ -2,22 +2,85 @@ r"""$B^+ / B_d$ lifetime ratio"""
 
 import flavio
 from flavio.physics import ckm
+from flavio.physics.running.running import get_alpha_s
 from flavio.config import config
 from .wilsoncoefficients import wcsm_nf5
 import numpy as np
 from math import pi
 
 
+def run_lifetime_bag_parameters(par, scale):
+    if scale < config['RGE thresholds']['mc'] or scale > 4.5:
+        raise ValueError("Scale for running the B lifetime bag parameters must be between mc and 4.5 GeV.")
+    alpha_s = get_alpha_s(par, scale)
+    alpha_s_0 = get_alpha_s(par, 1.5)
+    eta = alpha_s / alpha_s_0
+
+    beta_0_nf4 = 11 - (2/3)*4
+
+    B1qtilde_0 = par["bag_lifetime_B1qtilde"]
+    B2qtilde_0 = par["bag_lifetime_B2qtilde"]
+    B3qtilde_0 = par["bag_lifetime_B3qtilde"]
+    B4qtilde_0 = par["bag_lifetime_B4qtilde"]
+    B5qtilde_0 = par["bag_lifetime_B5qtilde"]
+    B6qtilde_0 = par["bag_lifetime_B6qtilde"]
+    B7qtilde_0 = par["bag_lifetime_B7qtilde"]
+    B8qtilde_0 = par["bag_lifetime_B8qtilde"]
+    deltaqq1tilde_0 = par["bag_lifetime_deltaqq1tilde"]
+    deltaqq2tilde_0 = par["bag_lifetime_deltaqq2tilde"]
+    deltaqq3tilde_0 = par["bag_lifetime_deltaqq3tilde"]
+    deltaqq4tilde_0 = par["bag_lifetime_deltaqq4tilde"]
+
+    # We only evolve the SM bag parameters B1-4, matching what is done in 2208.02643
+    gamma_0_D = np.array((8,8,-1,-1))
+    V = np.array((
+        (0,3/4,0,-6),
+        (3/4,0,-6,0),
+        (0,1,0,1),
+        (1,0,1,0)
+    ))
+    invV = np.array((
+        (0,4/27,0,8/9),
+        (4/27,0,8/9,0),
+        (0,-4/27,0,1/9),
+        (-4/27,0,1/9,0)
+    ))
+    # Evolution matrix from 1.5 GeV to scale
+    U = V @ np.diag(eta**(gamma_0_D / (2*beta_0_nf4))) @ invV
+
+    B_0 = np.array((B1qtilde_0, B2qtilde_0, B3qtilde_0, B4qtilde_0))
+    B1qtilde, B2qtilde, B3qtilde, B4qtilde = U @ B_0
+
+    return {
+        "bag_lifetime_B1qtilde": B1qtilde,
+        "bag_lifetime_B2qtilde": B2qtilde,
+        "bag_lifetime_B3qtilde": B3qtilde,
+        "bag_lifetime_B4qtilde": B4qtilde,
+        "bag_lifetime_B5qtilde": B5qtilde_0,
+        "bag_lifetime_B6qtilde": B6qtilde_0,
+        "bag_lifetime_B7qtilde": B7qtilde_0,
+        "bag_lifetime_B8qtilde": B8qtilde_0,
+        "bag_lifetime_deltaqq1tilde": deltaqq1tilde_0,
+        "bag_lifetime_deltaqq2tilde": deltaqq2tilde_0,
+        "bag_lifetime_deltaqq3tilde": deltaqq3tilde_0,
+        "bag_lifetime_deltaqq4tilde": deltaqq4tilde_0,
+    }
+
+
 def tau_Bp_over_tau_Bd_SM(par):
     r"""Sm contribution to the ratio of the B+ to Bd lifetimes."""
-    B1qtilde = par["bag_lifetime_B1qtilde"]
-    B2qtilde = par["bag_lifetime_B2qtilde"]
-    B3qtilde = par["bag_lifetime_B3qtilde"]
-    B4qtilde = par["bag_lifetime_B4qtilde"]
-    deltaqq1tilde = par["bag_lifetime_deltaqq1tilde"]
-    deltaqq2tilde = par["bag_lifetime_deltaqq2tilde"]
-    deltaqq3tilde = par["bag_lifetime_deltaqq3tilde"]
-    deltaqq4tilde = par["bag_lifetime_deltaqq4tilde"]
+    scale = config['renormalization scale']['b lifetime ratios']
+    if scale != 4.5:
+        raise ValueError("The SM prediction for the B+ / Bd lifetime ratio is only available at the scale 4.5 GeV.")
+    bag_params_dict = run_lifetime_bag_parameters(par, scale)
+    B1qtilde = bag_params_dict["bag_lifetime_B1qtilde"]
+    B2qtilde = bag_params_dict["bag_lifetime_B2qtilde"]
+    B3qtilde = bag_params_dict["bag_lifetime_B3qtilde"]
+    B4qtilde = bag_params_dict["bag_lifetime_B4qtilde"]
+    deltaqq1tilde = bag_params_dict["bag_lifetime_deltaqq1tilde"]
+    deltaqq2tilde = bag_params_dict["bag_lifetime_deltaqq2tilde"]
+    deltaqq3tilde = bag_params_dict["bag_lifetime_deltaqq3tilde"]
+    deltaqq4tilde = bag_params_dict["bag_lifetime_deltaqq4tilde"]
 
     # Phenomenological formula from Lenz:2022rbq
     flavio.citations.register("Lenz:2022rbq")
@@ -52,7 +115,7 @@ def siegen_basis_wcs(wc_obj, par, sector):
     return (CSM, CNP)
 
 
-def lifetimematrixelements(par, meson):
+def lifetimematrixelements(par, meson, scale):
     r"""Returns a dictionary with the values of the matrix elements of the
     $\Delta B=0$ operators.
 
@@ -62,7 +125,8 @@ def lifetimematrixelements(par, meson):
     """
     mM = par['m_'+meson]
     fM = par['f_'+meson]
-    BM = lambda i: par[f"bag_lifetime_B{i}qtilde"]
+    bag_params_dict = run_lifetime_bag_parameters(par, scale)
+    BM = lambda i: bag_params_dict[f"bag_lifetime_B{i}qtilde"]
     me = {}
     for i in range(1,9):
         me[f"{i}"]  = fM**2 * mM * BM(i) / 2
@@ -91,7 +155,7 @@ def weak_exchange(wc_obj, par, meson):
     ckm_factor = V[0,0] * V[1,2] # Vud Vcb
     prefactor = GF**2 * mb**2 * abs(ckm_factor)**2 * (1 - rho)**2 / (6 * pi)
 
-    me = lifetimematrixelements(par, meson)
+    me = lifetimematrixelements(par, meson, config["renormalization scale"]["b lifetime ratios"])
     A_WE_cu = np.array((
         ((-((2 + rho)*me["1"]) + 2*(me["2"] + 2*rho*me["2"] - 3*(2 + rho)*me["3"] + 6*(me["4"] + 2*rho*me["4"])))/6,-((2 + rho)*me["1"])/2 + me["2"] + 2*rho*me["2"],-(rho**0.5*(me["2"] + 6*me["4"])),-3*rho**0.5*me["2"],0,0,0,0,0,0,0,0,0,0,((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"] - 3*(2 + rho)*me["7p"] + 6*(me["8p"] + 2*rho*me["8p"])))/12,((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"]))/4,(rho**0.5*(me["5p"] - 2*(me["6p"] - 3*me["7p"] + 6*me["8p"])))/4,(3*rho**0.5*(me["5p"] - 2*me["6p"]))/4,-(rho**0.5*(me["5p"] + 2*(me["6p"] + 3*me["7p"] + 6*me["8p"]))),-3*rho**0.5*(me["5p"] + 2*me["6p"])),
         (-((2 + rho)*me["1"])/2 + me["2"] + 2*rho*me["2"],(-3*(2 + rho)*me["1"])/2 + 3*(1 + 2*rho)*me["2"],-3*rho**0.5*me["2"],-9*rho**0.5*me["2"],0,0,0,0,0,0,0,0,0,0,((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"]))/4,(3*((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"])))/4,(3*rho**0.5*(me["5p"] - 2*me["6p"]))/4,(9*rho**0.5*(me["5p"] - 2*me["6p"]))/4,-3*rho**0.5*(me["5p"] + 2*me["6p"]),-9*rho**0.5*(me["5p"] + 2*me["6p"])),
@@ -140,7 +204,7 @@ def pauli_interference(wc_obj, par, meson):
     ckm_factor = V[0,0] * V[1,2] # Vud Vcb
     prefactor = GF**2 * mb**2 * abs(ckm_factor)**2 * (1 - rho)**2 / (6 * pi)
 
-    me = lifetimematrixelements(par, meson)
+    me = lifetimematrixelements(par, meson, config["renormalization scale"]["b lifetime ratios"])
     A_PI_cd = np.array((
         (me["1"] + 6*me["3"],3*me["1"],-(rho**0.5*(me["1"] + 6*me["3"]))/2,(-3*rho**0.5*me["1"])/2,-(rho**0.5*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])))/4,(-3*rho**0.5*(me["5"] - 2*me["6"]))/4,(-me["5"] + 2*(me["6"] - 3*me["7"] + 6*me["8"]))/4,(-3*(me["5"] - 2*me["6"]))/4,3*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])),9*(me["5"] - 2*me["6"]),0,0,0,0,0,0,0,0,0,0),
         (3*me["1"],me["1"] + 6*me["3"],(-3*rho**0.5*me["1"])/2,-(rho**0.5*(me["1"] + 6*me["3"]))/2,(-3*rho**0.5*(me["5"] - 2*me["6"]))/4,-(rho**0.5*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])))/4,(-3*(me["5"] - 2*me["6"]))/4,(-me["5"] + 2*(me["6"] - 3*me["7"] + 6*me["8"]))/4,9*(me["5"] - 2*me["6"]),3*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])),0,0,0,0,0,0,0,0,0,0),
