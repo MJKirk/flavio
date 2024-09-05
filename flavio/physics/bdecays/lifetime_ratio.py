@@ -137,8 +137,7 @@ def lifetimematrixelements(par, meson, scale):
 def weak_exchange(wc_obj, par, meson):
     r"""BSM weak exchange contribution"""
     # For B+, WE contribution is CKM suppressed
-    # And for now, not implementing the CKM leading bscc term for Bs
-    if meson in ("B+", "Bs"):
+    if meson in ("B+",):
         return 0
     # So now Bd case only
     # Just dbcu sector, as others are CKM suppressed
@@ -185,9 +184,9 @@ def weak_exchange(wc_obj, par, meson):
 
 def pauli_interference(wc_obj, par, meson):
     r"""BSM Pauli interference contribution"""
-    # For Bd and Bs, SM side of Pauli exchange contributions are very small / missing (FCNC or LFV)
+    # For Bd, SM side of Pauli exchange contributions are very small / missing (FCNC or LFV)
     # so we can ignore BSM (since leading contribution comes from interference with SM)
-    if meson in ("B0", "Bs"):
+    if meson in ("B0",):
         return 0
     # So now B+ case only
     # Just dbcu sector, as others are CKM suppressed
