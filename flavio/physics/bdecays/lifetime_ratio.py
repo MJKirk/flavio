@@ -104,7 +104,7 @@ def siegen_basis_wcs(wc_obj, par, sector):
     CSM[0] = -1/6 * wc_sm[0] + wc_sm[1]
     CSM[1] = 1/2 * wc_sm[0]
 
-    CNP = np.zeros(20)
+    CNP = np.zeros(20, dtype=complex)
     siegen_wc_order = (
         "VLL", "VLLt", "VRL", "VRLt", "SLR", "SLRt", "SRR", "SRRt", "TRR", "TRRt",
         "VRR", "VRRt", "VLR", "VLRt", "SRL", "SRLt", "SLL", "SLLt", "TLL", "TLLt"
@@ -178,7 +178,8 @@ def weak_exchange(wc_obj, par, meson):
         (-3*rho**0.5*(me["5"] + 2*me["6"]),-9*rho**0.5*(me["5"] + 2*me["6"]),18*me["6"],54*me["6"],0,0,0,0,0,0,0,0,0,0,(3*rho**0.5*(me["1p"] + 2*me["2p"]))/2,(9*rho**0.5*(me["1p"] + 2*me["2p"]))/2,(0.5 + rho)*me["1p"] - (-4 + rho)*me["2p"],(3*(me["1p"] + 2*rho*me["1p"] - 2*(-4 + rho)*me["2p"]))/2,-2*(1 + 2*rho)*me["1p"] + 4*(14 + rho)*me["2p"],-6*(me["1p"] + 2*rho*me["1p"] - 2*(14 + rho)*me["2p"]))
     ))
 
-    return prefactor * (C @ A_WE_cu @ C.conj() - CSM @ A_WE_cu @ CSM.conj())
+    # We take take the real part to avoid tiny imaginary parts from floating point error
+    return prefactor * (C @ A_WE_cu @ C.conj() - CSM @ A_WE_cu @ CSM.conj()).real
 
 
 
@@ -227,7 +228,8 @@ def pauli_interference(wc_obj, par, meson):
         (0,0,0,0,0,0,0,0,0,0,9*(me["5"] - 2*me["6"]),3*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])),-6*rho**0.5*(me["5"] - me["6"]),-2*rho**0.5*(me["5"] - me["6"] + 6*me["7"] - 6*me["8"]),(-3*rho**0.5*(me["1"] + 2*me["2"]))/2,-(rho**0.5*(me["1"] + 2*(me["2"] + 3*me["3"] + 6*me["4"])))/2,((-4 + rho)*me["1"])/2 - (1 + 2*rho)*me["2"],((-4 + rho)*me["1"] - 2*(me["2"] + 2*rho*me["2"] - 3*(-4 + rho)*me["3"] + 6*(me["4"] + 2*rho*me["4"])))/6,2*(14 + rho)*me["1"] - 4*(me["2"] + 2*rho*me["2"]),(2*((14 + rho)*me["1"] - 2*(me["2"] + 2*rho*me["2"] - 3*(14 + rho)*me["3"] + 6*(me["4"] + 2*rho*me["4"]))))/3)
     ))
 
-    return prefactor * (C @ A_PI_cd @ C.conj() - CSM @ A_PI_cd @ CSM.conj())
+    # We take take the real part to avoid tiny imaginary parts from floating point error
+    return prefactor * (C @ A_PI_cd @ C.conj() - CSM @ A_PI_cd @ CSM.conj()).real
 
 
 def tau_Bp_over_tau_Bd(wc_obj, par):
