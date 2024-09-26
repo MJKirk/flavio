@@ -237,10 +237,9 @@ def tau_Bp_over_tau_Bd(wc_obj, par):
     the NP contribution from (some) four quark operators."""
     ratio_SM = tau_Bp_over_tau_Bd_SM(par)
 
-    tau_Bd = par['tau_B0']
     delta_ratio_BSM = gamma_BSM_dim6(wc_obj, par, "B0") - gamma_BSM_dim6(wc_obj, par, "B+")
 
-    return ratio_SM + delta_ratio_BSM * tau_Bd
+    return ratio_SM + delta_ratio_BSM * par['tau_B+']
 
 
 # Observable and Prediction instance
