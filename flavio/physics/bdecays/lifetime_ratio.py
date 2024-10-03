@@ -155,6 +155,7 @@ def weak_exchange(wc_obj, par, meson):
     prefactor = GF**2 * mb**2 * abs(ckm_factor)**2 * (1 - rho)**2 / (6 * pi)
 
     me = lifetimematrixelements(par, meson, config["renormalization scale"]["b lifetime ratios"])
+    flavio.citations.register("Lenz:2022pgw")
     A_WE_cu = np.array((
         ((-((2 + rho)*me["1"]) + 2*(me["2"] + 2*rho*me["2"] - 3*(2 + rho)*me["3"] + 6*(me["4"] + 2*rho*me["4"])))/6,-((2 + rho)*me["1"])/2 + me["2"] + 2*rho*me["2"],-(rho**0.5*(me["2"] + 6*me["4"])),-3*rho**0.5*me["2"],0,0,0,0,0,0,0,0,0,0,((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"] - 3*(2 + rho)*me["7p"] + 6*(me["8p"] + 2*rho*me["8p"])))/12,((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"]))/4,(rho**0.5*(me["5p"] - 2*(me["6p"] - 3*me["7p"] + 6*me["8p"])))/4,(3*rho**0.5*(me["5p"] - 2*me["6p"]))/4,-(rho**0.5*(me["5p"] + 2*(me["6p"] + 3*me["7p"] + 6*me["8p"]))),-3*rho**0.5*(me["5p"] + 2*me["6p"])),
         (-((2 + rho)*me["1"])/2 + me["2"] + 2*rho*me["2"],(-3*(2 + rho)*me["1"])/2 + 3*(1 + 2*rho)*me["2"],-3*rho**0.5*me["2"],-9*rho**0.5*me["2"],0,0,0,0,0,0,0,0,0,0,((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"]))/4,(3*((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"])))/4,(3*rho**0.5*(me["5p"] - 2*me["6p"]))/4,(9*rho**0.5*(me["5p"] - 2*me["6p"]))/4,-3*rho**0.5*(me["5p"] + 2*me["6p"]),-9*rho**0.5*(me["5p"] + 2*me["6p"])),
@@ -200,6 +201,7 @@ def pauli_interference(wc_obj, par, meson):
 
     me = lifetimematrixelements(par, meson, config["renormalization scale"]["b lifetime ratios"])
     # Matrix for Pauli interference contributions with down and strange quark in the loop are the same
+    flavio.citations.register("Lenz:2022pgw")
     A_PI_cd = np.array((
         (me["1"] + 6*me["3"],3*me["1"],-(rho**0.5*(me["1"] + 6*me["3"]))/2,(-3*rho**0.5*me["1"])/2,-(rho**0.5*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])))/4,(-3*rho**0.5*(me["5"] - 2*me["6"]))/4,(-me["5"] + 2*(me["6"] - 3*me["7"] + 6*me["8"]))/4,(-3*(me["5"] - 2*me["6"]))/4,3*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])),9*(me["5"] - 2*me["6"]),0,0,0,0,0,0,0,0,0,0),
         (3*me["1"],me["1"] + 6*me["3"],(-3*rho**0.5*me["1"])/2,-(rho**0.5*(me["1"] + 6*me["3"]))/2,(-3*rho**0.5*(me["5"] - 2*me["6"]))/4,-(rho**0.5*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])))/4,(-3*(me["5"] - 2*me["6"]))/4,(-me["5"] + 2*(me["6"] - 3*me["7"] + 6*me["8"]))/4,9*(me["5"] - 2*me["6"]),3*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])),0,0,0,0,0,0,0,0,0,0),
