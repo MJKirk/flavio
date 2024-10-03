@@ -135,12 +135,12 @@ def lifetimematrixelements(par, meson, scale):
 
 
 def weak_exchange(wc_obj, par, meson):
-    r"""BSM weak exchange contribution"""
-    # For B+, WE contribution is CKM suppressed
-    if meson in ("B+",):
+    r"""BSM weak exchange contributions. For now, only from b->c ubar d
+    (dbcu sector) and b->c ubar s (sbcu sector) operators."""
+    # For B+, no WE contribution from dbcu or sbcu sectors
+    if meson == "B+":
         return 0
-    # So now Bd case only
-    # Just dbcu sector, as others are CKM suppressed
+    # So now Bd case only, and so just dbcu sector
     sector = "dbcu"
 
     CSM, CNP = siegen_basis_wcs(wc_obj, par, sector)
@@ -178,33 +178,28 @@ def weak_exchange(wc_obj, par, meson):
         (-3*rho**0.5*(me["5"] + 2*me["6"]),-9*rho**0.5*(me["5"] + 2*me["6"]),18*me["6"],54*me["6"],0,0,0,0,0,0,0,0,0,0,(3*rho**0.5*(me["1p"] + 2*me["2p"]))/2,(9*rho**0.5*(me["1p"] + 2*me["2p"]))/2,(0.5 + rho)*me["1p"] - (-4 + rho)*me["2p"],(3*(me["1p"] + 2*rho*me["1p"] - 2*(-4 + rho)*me["2p"]))/2,-2*(1 + 2*rho)*me["1p"] + 4*(14 + rho)*me["2p"],-6*(me["1p"] + 2*rho*me["1p"] - 2*(14 + rho)*me["2p"]))
     ))
 
-    # We take take the real part to avoid tiny imaginary parts from floating point error
+    # While this term is manifestly real, we take take the real part to avoid
+    # tiny imaginary parts from floating point errors
     return prefactor * (C @ A_WE_cu @ C.conj() - CSM @ A_WE_cu @ CSM.conj()).real
 
 
 
 def pauli_interference(wc_obj, par, meson):
-    r"""BSM Pauli interference contribution"""
-    # For Bd, SM side of Pauli exchange contributions are very small / missing (FCNC or LFV)
-    # so we can ignore BSM (since leading contribution comes from interference with SM)
-    if meson in ("B0",):
+    r"""BSM Pauli interference contributions. For now, only from b->c ubar d
+    (dbcu sector) and b->c ubar s (sbcu sector) operators."""
+    # For Bd, no PI from dbcu or sbcu sectors
+    if meson == "B0":
         return 0
-    # So now B+ case only
-    # Just dbcu sector, as others are CKM suppressed
-    sector = "dbcu"
-
-    CSM, CNP = siegen_basis_wcs(wc_obj, par, sector)
-    C = CSM + CNP
+    # So now B+ case only: both dbcu and sbcu sectors contribute (with different CKM factors)
 
     GF = par["GF"]
     mb = flavio.physics.running.running.get_mb_KS(par, 1)
     mc = par["m_c"]
     rho = mc**2 / mb**2
     V = ckm.get_ckm(par)
-    ckm_factor = V[0,0] * V[1,2] # Vud Vcb
-    prefactor = GF**2 * mb**2 * abs(ckm_factor)**2 * (1 - rho)**2 / (6 * pi)
 
     me = lifetimematrixelements(par, meson, config["renormalization scale"]["b lifetime ratios"])
+    # Matrix for Pauli interference contributions with down and strange quark in the loop are the same
     A_PI_cd = np.array((
         (me["1"] + 6*me["3"],3*me["1"],-(rho**0.5*(me["1"] + 6*me["3"]))/2,(-3*rho**0.5*me["1"])/2,-(rho**0.5*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])))/4,(-3*rho**0.5*(me["5"] - 2*me["6"]))/4,(-me["5"] + 2*(me["6"] - 3*me["7"] + 6*me["8"]))/4,(-3*(me["5"] - 2*me["6"]))/4,3*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])),9*(me["5"] - 2*me["6"]),0,0,0,0,0,0,0,0,0,0),
         (3*me["1"],me["1"] + 6*me["3"],(-3*rho**0.5*me["1"])/2,-(rho**0.5*(me["1"] + 6*me["3"]))/2,(-3*rho**0.5*(me["5"] - 2*me["6"]))/4,-(rho**0.5*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])))/4,(-3*(me["5"] - 2*me["6"]))/4,(-me["5"] + 2*(me["6"] - 3*me["7"] + 6*me["8"]))/4,9*(me["5"] - 2*me["6"]),3*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])),0,0,0,0,0,0,0,0,0,0),
@@ -228,8 +223,18 @@ def pauli_interference(wc_obj, par, meson):
         (0,0,0,0,0,0,0,0,0,0,9*(me["5"] - 2*me["6"]),3*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])),-6*rho**0.5*(me["5"] - me["6"]),-2*rho**0.5*(me["5"] - me["6"] + 6*me["7"] - 6*me["8"]),(-3*rho**0.5*(me["1"] + 2*me["2"]))/2,-(rho**0.5*(me["1"] + 2*(me["2"] + 3*me["3"] + 6*me["4"])))/2,((-4 + rho)*me["1"])/2 - (1 + 2*rho)*me["2"],((-4 + rho)*me["1"] - 2*(me["2"] + 2*rho*me["2"] - 3*(-4 + rho)*me["3"] + 6*(me["4"] + 2*rho*me["4"])))/6,2*(14 + rho)*me["1"] - 4*(me["2"] + 2*rho*me["2"]),(2*((14 + rho)*me["1"] - 2*(me["2"] + 2*rho*me["2"] - 3*(14 + rho)*me["3"] + 6*(me["4"] + 2*rho*me["4"]))))/3)
     ))
 
-    # We take take the real part to avoid tiny imaginary parts from floating point error
-    return prefactor * (C @ A_PI_cd @ C.conj() - CSM @ A_PI_cd @ CSM.conj()).real
+    result = 0
+    dflav = {'d': 0, 's': 1, 'b': 2}
+    for sector in ("dbcu", "sbcu"):
+        CSM, CNP = siegen_basis_wcs(wc_obj, par, sector)
+        C = CSM + CNP
+        ckm_factor = V[0, dflav[sector[0]]] * V[1,2] # Vud Vcb or Vus Vcb
+        prefactor = GF**2 * mb**2 * abs(ckm_factor)**2 * (1 - rho)**2 / (6 * pi)
+        # While this expression is manifestly real, we take take the real part to avoid
+        # tiny imaginary parts from floating point errors
+        result += prefactor * (C @ A_PI_cd @ C.conj() - CSM @ A_PI_cd @ CSM.conj()).real
+
+    return result
 
 
 def tau_Bp_over_tau_Bd(wc_obj, par):

@@ -1,6 +1,5 @@
 import unittest
 import flavio
-import flavio.physics
 
 
 par = flavio.default_parameters.get_central_all()
@@ -41,6 +40,10 @@ class TestTauBpoBd(unittest.TestCase):
         wc.set_initial({"CVLLt_bcud": 1}, scale=4.5)
         self.assertAlmostEqual(1e15*flavio.physics.bdecays.lifetime_ratio.weak_exchange(wc, par, "B0"), 9.79346592, places=5)
 
+        wc = flavio.WilsonCoefficients()
+        wc.set_initial({"CVLLt_bcus": 1}, scale=4.5)
+        self.assertEqual(flavio.physics.bdecays.lifetime_ratio.weak_exchange(wc, par, "B0"), 0)
+
     def test_PI_cd(self):
         self.assertEqual(flavio.physics.bdecays.lifetime_ratio.pauli_interference(wc_sm, par, "B+"), 0)
 
@@ -49,8 +52,18 @@ class TestTauBpoBd(unittest.TestCase):
         self.assertAlmostEqual(1e14*flavio.physics.bdecays.lifetime_ratio.pauli_interference(wc, par, "B+"), 2.82494420, places=6)
 
         wc = flavio.WilsonCoefficients()
+        wc.set_initial({"CVLL_bcus": 1}, scale=4.5)
+        self.assertAlmostEqual(1e14*flavio.physics.bdecays.lifetime_ratio.pauli_interference(wc, par, "B+"), 0.1503590699, places=6)
+
+        wc = flavio.WilsonCoefficients()
         wc.set_initial({"CVLLt_bcud": 1}, scale=4.5)
         self.assertAlmostEqual(1e13*flavio.physics.bdecays.lifetime_ratio.pauli_interference(wc, par, "B+"), 1.38771099, places=6)
+
+        wc = flavio.WilsonCoefficients()
+        wc.set_initial({"CVLLt_bcus": 1}, scale=4.5)
+        Vud = flavio.physics.ckm.get_ckm(par)[0,0]
+        Vus = flavio.physics.ckm.get_ckm(par)[0,1]
+        self.assertAlmostEqual(1e13*flavio.physics.bdecays.lifetime_ratio.pauli_interference(wc, par, "B+"), 1.38771099*(Vus/Vud)**2, places=6)
 
     def test_NP_bcud(self):
         wc = flavio.WilsonCoefficients()
@@ -64,3 +77,16 @@ class TestTauBpoBd(unittest.TestCase):
         wc = flavio.WilsonCoefficients()
         wc.set_initial({"CVRLt_bcud": -0.15, "CSLL_bcud": 0.2}, scale=4.5)
         self.assertAlmostEqual(flavio.np_prediction("tau_B+/tau_Bd", wc), 1.113086143)
+
+    def test_NP_bcus(self):
+        wc = flavio.WilsonCoefficients()
+        wc.set_initial({"CVLL_bcus": -2}, scale=4.5)
+        self.assertAlmostEqual(flavio.np_prediction("tau_B+/tau_Bd", wc), 1.079837520)
+
+        wc = flavio.WilsonCoefficients()
+        wc.set_initial({"CVLLt_bcus": 3}, scale=4.5)
+        self.assertAlmostEqual(flavio.np_prediction("tau_B+/tau_Bd", wc), 1.017205203)
+
+        wc = flavio.WilsonCoefficients()
+        wc.set_initial({"CVRLt_bcus": -0.15, "CSLL_bcus": 0.2}, scale=4.5)
+        self.assertAlmostEqual(flavio.np_prediction("tau_B+/tau_Bd", wc), 1.083496791)
