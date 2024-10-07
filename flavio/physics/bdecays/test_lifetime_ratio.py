@@ -90,3 +90,16 @@ class TestTauBpoBd(unittest.TestCase):
         wc = flavio.WilsonCoefficients()
         wc.set_initial({"CVRLt_bcus": -0.15, "CSLL_bcus": 0.2}, scale=4.5)
         self.assertAlmostEqual(flavio.np_prediction("tau_B+/tau_Bd", wc), 1.083496791)
+
+    def test_NP_dbcc(self):
+        wc = flavio.WilsonCoefficients()
+        wc.set_initial({"CVLL_bdcc": -2}, scale=4.5)
+        self.assertAlmostEqual(flavio.np_prediction("tau_B+/tau_Bd", wc), 1.084098486)
+
+        wc = flavio.WilsonCoefficients()
+        wc.set_initial({"CVLLt_bdcc": 3}, scale=4.5)
+        self.assertAlmostEqual(flavio.np_prediction("tau_B+/tau_Bd", wc), 1.102675260)
+
+        wc = flavio.WilsonCoefficients()
+        wc.set_initial({"CVRLt_bdcc": -0.15, "CSLL_bdcc": 0.2}, scale=4.5)
+        self.assertAlmostEqual(flavio.np_prediction("tau_B+/tau_Bd", wc), 1.085435224)

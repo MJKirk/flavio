@@ -98,7 +98,8 @@ def gamma_BSM_dim6(wc_obj, par, meson):
 def siegen_basis_wcs(wc_obj, par, sector):
     scale = config['renormalization scale']['b lifetime ratios']
     wc_sm = wcsm_nf5(scale)
-    flavio_wc_bsm = wc_obj.get_wc(sector=sector, scale=scale, par=par)
+    wcxf_sector = "db" if sector == "dbcc" else sector
+    flavio_wc_bsm = wc_obj.get_wc(sector=wcxf_sector, scale=scale, par=par)
 
     CSM = np.zeros(20)
     CSM[0] = -1/6 * wc_sm[0] + wc_sm[1]
@@ -109,7 +110,8 @@ def siegen_basis_wcs(wc_obj, par, sector):
         "VLL", "VLLt", "VRL", "VRLt", "SLR", "SLRt", "SRR", "SRRt", "TRR", "TRRt",
         "VRR", "VRRt", "VLR", "VLRt", "SRL", "SRLt", "SLL", "SLLt", "TLL", "TLLt"
     )
-    flavio_sector_name = sector[1:4] + sector[0] # Indices flipped for flavio (sbcu -> bcus, etc)
+    flavio_sector_name_mapping = {"sbcu": "bcus", "dbcu": "bcud", "dbcc": "bdcc"}
+    flavio_sector_name = flavio_sector_name_mapping[sector]
     for i, name in enumerate(siegen_wc_order):
         CNP[i] = flavio_wc_bsm[f"C{name}_{flavio_sector_name}"]
     return (CSM, CNP)
@@ -136,26 +138,21 @@ def lifetimematrixelements(par, meson, scale):
 
 def weak_exchange(wc_obj, par, meson):
     r"""BSM weak exchange contributions. For now, only from b->c ubar d
-    (dbcu sector) and b->c ubar s (sbcu sector) operators."""
-    # For B+, no WE contribution from dbcu or sbcu sectors
+    (dbcu sector), b->c ubar s (sbcu sector), and b->c cbar d (db sector) operators."""
+    # For B+, no WE contribution from our considered sectors
     if meson == "B+":
         return 0
-    # So now Bd case only, and so just dbcu sector
-    sector = "dbcu"
-
-    CSM, CNP = siegen_basis_wcs(wc_obj, par, sector)
-    C = CSM + CNP
+    # So now Bd case only: dbcu and dbcc operators contribute
 
     GF = par["GF"]
     mb = flavio.physics.running.running.get_mb_KS(par, 1)
     mc = par["m_c"]
     rho = mc**2 / mb**2
     V = ckm.get_ckm(par)
-    ckm_factor = V[0,0] * V[1,2] # Vud Vcb
-    prefactor = GF**2 * mb**2 * abs(ckm_factor)**2 * (1 - rho)**2 / (6 * pi)
 
     me = lifetimematrixelements(par, meson, config["renormalization scale"]["b lifetime ratios"])
     flavio.citations.register("Lenz:2022pgw")
+    # See eqs 2.28 - 2.33 in Lenz:2022pgw
     A_WE_cu = np.array((
         ((-((2 + rho)*me["1"]) + 2*(me["2"] + 2*rho*me["2"] - 3*(2 + rho)*me["3"] + 6*(me["4"] + 2*rho*me["4"])))/6,-((2 + rho)*me["1"])/2 + me["2"] + 2*rho*me["2"],-(rho**0.5*(me["2"] + 6*me["4"])),-3*rho**0.5*me["2"],0,0,0,0,0,0,0,0,0,0,((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"] - 3*(2 + rho)*me["7p"] + 6*(me["8p"] + 2*rho*me["8p"])))/12,((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"]))/4,(rho**0.5*(me["5p"] - 2*(me["6p"] - 3*me["7p"] + 6*me["8p"])))/4,(3*rho**0.5*(me["5p"] - 2*me["6p"]))/4,-(rho**0.5*(me["5p"] + 2*(me["6p"] + 3*me["7p"] + 6*me["8p"]))),-3*rho**0.5*(me["5p"] + 2*me["6p"])),
         (-((2 + rho)*me["1"])/2 + me["2"] + 2*rho*me["2"],(-3*(2 + rho)*me["1"])/2 + 3*(1 + 2*rho)*me["2"],-3*rho**0.5*me["2"],-9*rho**0.5*me["2"],0,0,0,0,0,0,0,0,0,0,((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"]))/4,(3*((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"])))/4,(3*rho**0.5*(me["5p"] - 2*me["6p"]))/4,(9*rho**0.5*(me["5p"] - 2*me["6p"]))/4,-3*rho**0.5*(me["5p"] + 2*me["6p"]),-9*rho**0.5*(me["5p"] + 2*me["6p"])),
@@ -179,10 +176,52 @@ def weak_exchange(wc_obj, par, meson):
         (-3*rho**0.5*(me["5"] + 2*me["6"]),-9*rho**0.5*(me["5"] + 2*me["6"]),18*me["6"],54*me["6"],0,0,0,0,0,0,0,0,0,0,(3*rho**0.5*(me["1p"] + 2*me["2p"]))/2,(9*rho**0.5*(me["1p"] + 2*me["2p"]))/2,(0.5 + rho)*me["1p"] - (-4 + rho)*me["2p"],(3*(me["1p"] + 2*rho*me["1p"] - 2*(-4 + rho)*me["2p"]))/2,-2*(1 + 2*rho)*me["1p"] + 4*(14 + rho)*me["2p"],-6*(me["1p"] + 2*rho*me["1p"] - 2*(14 + rho)*me["2p"]))
     ))
 
-    # While this term is manifestly real, we take take the real part to avoid
-    # tiny imaginary parts from floating point errors
-    return prefactor * (C @ A_WE_cu @ C.conj() - CSM @ A_WE_cu @ CSM.conj()).real
+    flavio.citations.register("Jager:2017gal")
+    flavio.citations.register("Jager:2019bgk")
+    # See eqs A.2 - A.7 in Lenz:2022pgw
+    A_WE_cc = np.array((
+        (((-1 + rho)*me["1"] + me["2"] + 2*rho*me["2"] + 6*((-1 + rho)*me["3"] + me["4"] + 2*rho*me["4"]))/3, (-1 + rho)*me["1"] + me["2"] + 2*rho*me["2"], -(rho**0.5*(me["2"] + 6*me["4"])), -3*rho**0.5*me["2"], (rho*(me["1"] + 6*me["3"]))/2, (3*rho*me["1"])/2, (rho**0.5*(me["1"] + 6*me["3"]))/4, (3*rho**0.5*me["1"])/4, -(rho**0.5*(me["1"] - 4*me["2"] + 6*(me["3"] - 4*me["4"]))), -3*rho**0.5*(me["1"] - 4*me["2"]), -(rho*(me["5p"] + 6*me["7p"])), -3*rho*me["5p"], rho**0.5*(me["6p"] + 6*me["8p"]), 3*rho**0.5*me["6p"], (me["5p"] - rho*me["5p"] - (1 + 2*rho)*me["6p"] - 6*((-1 + rho)*me["7p"] + me["8p"] + 2*rho*me["8p"]))/6, (me["5p"] - rho*me["5p"] - (1 + 2*rho)*me["6p"])/2, (rho**0.5*(me["5p"] - 2*(me["6p"] - 3*me["7p"] + 6*me["8p"])))/4, (3*rho**0.5*(me["5p"] - 2*me["6p"]))/4, -(rho**0.5*(me["5p"] + 2*(me["6p"] + 3*me["7p"] + 6*me["8p"]))), -3*rho**0.5*(me["5p"] + 2*me["6p"])),
+        ((-1 + rho)*me["1"] + me["2"] + 2*rho*me["2"], 3*((-1 + rho)*me["1"] + me["2"] + 2*rho*me["2"]), -3*rho**0.5*me["2"], -9*rho**0.5*me["2"], (3*rho*me["1"])/2, (9*rho*me["1"])/2, (3*rho**0.5*me["1"])/4, (9*rho**0.5*me["1"])/4, -3*rho**0.5*(me["1"] - 4*me["2"]), -9*rho**0.5*(me["1"] - 4*me["2"]), -3*rho*me["5p"], -9*rho*me["5p"], 3*rho**0.5*me["6p"], 9*rho**0.5*me["6p"], (me["5p"] - rho*me["5p"] - (1 + 2*rho)*me["6p"])/2, (-3*((-1 + rho)*me["5p"] + me["6p"] + 2*rho*me["6p"]))/2, (3*rho**0.5*(me["5p"] - 2*me["6p"]))/4, (9*rho**0.5*(me["5p"] - 2*me["6p"]))/4, -3*rho**0.5*(me["5p"] + 2*me["6p"]), -9*rho**0.5*(me["5p"] + 2*me["6p"])),
+        (-(rho**0.5*(me["2"] + 6*me["4"])), -3*rho**0.5*me["2"], -2*(-1 + 2*rho)*(me["2"] + 6*me["4"]), -6*(-1 + 2*rho)*me["2"], -(rho**0.5*(me["2"] + 6*me["4"]))/2, (-3*rho**0.5*me["2"])/2, -(rho*(me["2"] + 6*me["4"])), -3*rho*me["2"], -12*rho*(me["2"] + 6*me["4"]), -36*rho*me["2"], rho**0.5*(me["6p"] + 6*me["8p"]), 3*rho**0.5*me["6p"], -4*rho*(me["6p"] + 6*me["8p"]), -12*rho*me["6p"], (rho**0.5*(me["6p"] + 6*me["8p"]))/2, (3*rho**0.5*me["6p"])/2, -((-1 + 2*rho)*(me["6p"] + 6*me["8p"]))/2, (1.5 - 3*rho)*me["6p"], -6*(-1 + 2*rho)*(me["6p"] + 6*me["8p"]), -18*(-1 + 2*rho)*me["6p"]),
+        (-3*rho**0.5*me["2"], -9*rho**0.5*me["2"], -6*(-1 + 2*rho)*me["2"], -18*(-1 + 2*rho)*me["2"], (-3*rho**0.5*me["2"])/2, (-9*rho**0.5*me["2"])/2, -3*rho*me["2"], -9*rho*me["2"], -36*rho*me["2"], -108*rho*me["2"], 3*rho**0.5*me["6p"], 9*rho**0.5*me["6p"], -12*rho*me["6p"], -36*rho*me["6p"], (3*rho**0.5*me["6p"])/2, (9*rho**0.5*me["6p"])/2, (1.5 - 3*rho)*me["6p"], (4.5 - 9*rho)*me["6p"], -18*(-1 + 2*rho)*me["6p"], -54*(-1 + 2*rho)*me["6p"]), 
+        ((rho*(me["1"] + 6*me["3"]))/2, (3*rho*me["1"])/2, -(rho**0.5*(me["2"] + 6*me["4"]))/2, (-3*rho**0.5*me["2"])/2, ((-1 + rho)*me["1"] + me["2"] + 2*rho*me["2"] + 6*((-1 + rho)*me["3"] + me["4"] + 2*rho*me["4"]))/12, ((-1 + rho)*me["1"] + me["2"] + 2*rho*me["2"])/4, -(rho**0.5*(me["1"] - 2*(me["2"] - 3*me["3"] + 6*me["4"])))/8, (-3*rho**0.5*(me["1"] - 2*me["2"]))/8, (rho**0.5*(me["1"] + 2*(me["2"] + 3*me["3"] + 6*me["4"])))/2, (3*rho**0.5*(me["1"] + 2*me["2"]))/2, (me["5p"] - rho*me["5p"] - (1 + 2*rho)*me["6p"] - 6*((-1 + rho)*me["7p"] + me["8p"] + 2*rho*me["8p"]))/6, (me["5p"] - rho*me["5p"] - (1 + 2*rho)*me["6p"])/2, (rho**0.5*(me["6p"] + 6*me["8p"]))/2, (3*rho**0.5*me["6p"])/2, -(rho*(me["5p"] + 6*me["7p"]))/4, (-3*rho*me["5p"])/4, -(rho**0.5*(me["5p"] + 6*me["7p"]))/8, (-3*rho**0.5*me["5p"])/8, (rho**0.5*(me["5p"] - 4*me["6p"] + 6*(me["7p"] - 4*me["8p"])))/2, (3*rho**0.5*(me["5p"] - 4*me["6p"]))/2),
+        ((3*rho*me["1"])/2, (9*rho*me["1"])/2, (-3*rho**0.5*me["2"])/2, (-9*rho**0.5*me["2"])/2, ((-1 + rho)*me["1"] + me["2"] + 2*rho*me["2"])/4, (3*((-1 + rho)*me["1"] + me["2"] + 2*rho*me["2"]))/4, (-3*rho**0.5*(me["1"] - 2*me["2"]))/8, (-9*rho**0.5*(me["1"] - 2*me["2"]))/8, (3*rho**0.5*(me["1"] + 2*me["2"]))/2, (9*rho**0.5*(me["1"] + 2*me["2"]))/2, (me["5p"] - rho*me["5p"] - (1 + 2*rho)*me["6p"])/2, (-3*((-1 + rho)*me["5p"] + me["6p"] + 2*rho*me["6p"]))/2, (3*rho**0.5*me["6p"])/2, (9*rho**0.5*me["6p"])/2, (-3*rho*me["5p"])/4, (-9*rho*me["5p"])/4, (-3*rho**0.5*me["5p"])/8, (-9*rho**0.5*me["5p"])/8, (3*rho**0.5*(me["5p"] - 4*me["6p"]))/2, (9*rho**0.5*(me["5p"] - 4*me["6p"]))/2),
+        ((rho**0.5*(me["1"] + 6*me["3"]))/4, (3*rho**0.5*me["1"])/4, -(rho*(me["2"] + 6*me["4"])), -3*rho*me["2"], -(rho**0.5*(me["1"] - 2*(me["2"] - 3*me["3"] + 6*me["4"])))/8, (-3*rho**0.5*(me["1"] - 2*me["2"]))/8, (-((1 + 2*rho)*me["1"]) - 4*(-1 + rho)*me["2"] - 6*(me["3"] + 2*rho*me["3"] + 4*(-1 + rho)*me["4"]))/24, (-((1 + 2*rho)*me["1"]) - 4*(-1 + rho)*me["2"])/8, (me["1"] + 2*rho*me["1"] + (8 - 20*rho)*me["2"] + 6*(me["3"] + 2*rho*me["3"] + 8*me["4"] - 20*rho*me["4"]))/6, (0.5 + rho)*me["1"] + 2*(2 - 5*rho)*me["2"], (rho**0.5*(me["5p"] - 2*(me["6p"] - 3*me["7p"] + 6*me["8p"])))/4, (3*rho**0.5*(me["5p"] - 2*me["6p"]))/4, -((-1 + 2*rho)*(me["6p"] + 6*me["8p"]))/2, (1.5 - 3*rho)*me["6p"], -(rho**0.5*(me["5p"] + 6*me["7p"]))/8, (-3*rho**0.5*me["5p"])/8, -(rho*(me["5p"] + 6*me["7p"]))/4, (-3*rho*me["5p"])/4, rho*(me["5p"] - 4*me["6p"] + 6*(me["7p"] - 4*me["8p"])), 3*rho*(me["5p"] - 4*me["6p"])),
+        ((3*rho**0.5*me["1"])/4, (9*rho**0.5*me["1"])/4, -3*rho*me["2"], -9*rho*me["2"], (-3*rho**0.5*(me["1"] - 2*me["2"]))/8, (-9*rho**0.5*(me["1"] - 2*me["2"]))/8, (-((1 + 2*rho)*me["1"]) - 4*(-1 + rho)*me["2"])/8, (-3*(me["1"] + 2*rho*me["1"] + 4*(-1 + rho)*me["2"]))/8, (0.5 + rho)*me["1"] + 2*(2 - 5*rho)*me["2"], (3*(me["1"] + 2*rho*me["1"] + 4*(2 - 5*rho)*me["2"]))/2, (3*rho**0.5*(me["5p"] - 2*me["6p"]))/4, (9*rho**0.5*(me["5p"] - 2*me["6p"]))/4, (1.5 - 3*rho)*me["6p"], (4.5 - 9*rho)*me["6p"], (-3*rho**0.5*me["5p"])/8, (-9*rho**0.5*me["5p"])/8, (-3*rho*me["5p"])/4, (-9*rho*me["5p"])/4, 3*rho*(me["5p"] - 4*me["6p"]), 9*rho*(me["5p"] - 4*me["6p"])),
+        (-(rho**0.5*(me["1"] - 4*me["2"] + 6*(me["3"] - 4*me["4"]))), -3*rho**0.5*(me["1"] - 4*me["2"]), -12*rho*(me["2"] + 6*me["4"]), -36*rho*me["2"], (rho**0.5*(me["1"] + 2*(me["2"] + 3*me["3"] + 6*me["4"])))/2, (3*rho**0.5*(me["1"] + 2*me["2"]))/2, (me["1"] + 2*rho*me["1"] + (8 - 20*rho)*me["2"] + 6*(me["3"] + 2*rho*me["3"] + 8*me["4"] - 20*rho*me["4"]))/6, (0.5 + rho)*me["1"] + 2*(2 - 5*rho)*me["2"], (-2*(me["1"] + 2*rho*me["1"] + 4*(-7 + 13*rho)*me["2"] + 6*(me["3"] + 2*rho*me["3"] - 28*me["4"] + 52*rho*me["4"])))/3, -2*(me["1"] + 2*rho*me["1"] + 4*(-7 + 13*rho)*me["2"]), -(rho**0.5*(me["5p"] + 2*(me["6p"] + 3*me["7p"] + 6*me["8p"]))), -3*rho**0.5*(me["5p"] + 2*me["6p"]), -6*(-1 + 2*rho)*(me["6p"] + 6*me["8p"]), -18*(-1 + 2*rho)*me["6p"], (rho**0.5*(me["5p"] - 4*me["6p"] + 6*(me["7p"] - 4*me["8p"])))/2, (3*rho**0.5*(me["5p"] - 4*me["6p"]))/2, rho*(me["5p"] - 4*me["6p"] + 6*(me["7p"] - 4*me["8p"])), 3*rho*(me["5p"] - 4*me["6p"]), -4*rho*(me["5p"] + 8*me["6p"] + 6*(me["7p"] + 8*me["8p"])), -12*rho*(me["5p"] + 8*me["6p"])),
+        (-3*rho**0.5*(me["1"] - 4*me["2"]), -9*rho**0.5*(me["1"] - 4*me["2"]), -36*rho*me["2"], -108*rho*me["2"], (3*rho**0.5*(me["1"] + 2*me["2"]))/2, (9*rho**0.5*(me["1"] + 2*me["2"]))/2, (0.5 + rho)*me["1"] + 2*(2 - 5*rho)*me["2"], (3*(me["1"] + 2*rho*me["1"] + 4*(2 - 5*rho)*me["2"]))/2, -2*(me["1"] + 2*rho*me["1"] + 4*(-7 + 13*rho)*me["2"]), -6*(me["1"] + 2*rho*me["1"] + 4*(-7 + 13*rho)*me["2"]), -3*rho**0.5*(me["5p"] + 2*me["6p"]), -9*rho**0.5*(me["5p"] + 2*me["6p"]), -18*(-1 + 2*rho)*me["6p"], -54*(-1 + 2*rho)*me["6p"], (3*rho**0.5*(me["5p"] - 4*me["6p"]))/2, (9*rho**0.5*(me["5p"] - 4*me["6p"]))/2, 3*rho*(me["5p"] - 4*me["6p"]), 9*rho*(me["5p"] - 4*me["6p"]), -12*rho*(me["5p"] + 8*me["6p"]), -36*rho*(me["5p"] + 8*me["6p"])),
+        (-(rho*(me["5"] + 6*me["7"])), -3*rho*me["5"], rho**0.5*(me["6"] + 6*me["8"]), 3*rho**0.5*me["6"], (me["5"] - rho*me["5"] - (1 + 2*rho)*me["6"] - 6*((-1 + rho)*me["7"] + me["8"] + 2*rho*me["8"]))/6, (me["5"] - rho*me["5"] - (1 + 2*rho)*me["6"])/2, (rho**0.5*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])))/4, (3*rho**0.5*(me["5"] - 2*me["6"]))/4, -(rho**0.5*(me["5"] + 2*(me["6"] + 3*me["7"] + 6*me["8"]))), -3*rho**0.5*(me["5"] + 2*me["6"]), ((-1 + rho)*me["1p"] + me["2p"] + 2*rho*me["2p"] + 6*((-1 + rho)*me["3p"] + me["4p"] + 2*rho*me["4p"]))/3, (-1 + rho)*me["1p"] + me["2p"] + 2*rho*me["2p"], -(rho**0.5*(me["2p"] + 6*me["4p"])), -3*rho**0.5*me["2p"], (rho*(me["1p"] + 6*me["3p"]))/2, (3*rho*me["1p"])/2, (rho**0.5*(me["1p"] + 6*me["3p"]))/4, (3*rho**0.5*me["1p"])/4, -(rho**0.5*(me["1p"] - 4*me["2p"] + 6*(me["3p"] - 4*me["4p"]))), -3*rho**0.5*(me["1p"] - 4*me["2p"])),
+        (-3*rho*me["5"], -9*rho*me["5"], 3*rho**0.5*me["6"], 9*rho**0.5*me["6"], (me["5"] - rho*me["5"] - (1 + 2*rho)*me["6"])/2, (-3*((-1 + rho)*me["5"] + me["6"] + 2*rho*me["6"]))/2, (3*rho**0.5*(me["5"] - 2*me["6"]))/4, (9*rho**0.5*(me["5"] - 2*me["6"]))/4, -3*rho**0.5*(me["5"] + 2*me["6"]), -9*rho**0.5*(me["5"] + 2*me["6"]), (-1 + rho)*me["1p"] + me["2p"] + 2*rho*me["2p"], 3*((-1 + rho)*me["1p"] + me["2p"] + 2*rho*me["2p"]), -3*rho**0.5*me["2p"], -9*rho**0.5*me["2p"], (3*rho*me["1p"])/2, (9*rho*me["1p"])/2, (3*rho**0.5*me["1p"])/4, (9*rho**0.5*me["1p"])/4, -3*rho**0.5*(me["1p"] - 4*me["2p"]), -9*rho**0.5*(me["1p"] - 4*me["2p"])),
+        (rho**0.5*(me["6"] + 6*me["8"]), 3*rho**0.5*me["6"], -4*rho*(me["6"] + 6*me["8"]), -12*rho*me["6"], (rho**0.5*(me["6"] + 6*me["8"]))/2, (3*rho**0.5*me["6"])/2, -((-1 + 2*rho)*(me["6"] + 6*me["8"]))/2, (1.5 - 3*rho)*me["6"], -6*(-1 + 2*rho)*(me["6"] + 6*me["8"]), -18*(-1 + 2*rho)*me["6"], -(rho**0.5*(me["2p"] + 6*me["4p"])), -3*rho**0.5*me["2p"], -2*(-1 + 2*rho)*(me["2p"] + 6*me["4p"]), -6*(-1 + 2*rho)*me["2p"], -(rho**0.5*(me["2p"] + 6*me["4p"]))/2, (-3*rho**0.5*me["2p"])/2, -(rho*(me["2p"] + 6*me["4p"])), -3*rho*me["2p"], -12*rho*(me["2p"] + 6*me["4p"]), -36*rho*me["2p"]),
+        (3*rho**0.5*me["6"], 9*rho**0.5*me["6"], -12*rho*me["6"], -36*rho*me["6"], (3*rho**0.5*me["6"])/2, (9*rho**0.5*me["6"])/2, (1.5 - 3*rho)*me["6"], (4.5 - 9*rho)*me["6"], -18*(-1 + 2*rho)*me["6"], -54*(-1 + 2*rho)*me["6"], -3*rho**0.5*me["2p"], -9*rho**0.5*me["2p"], -6*(-1 + 2*rho)*me["2p"], -18*(-1 + 2*rho)*me["2p"], (-3*rho**0.5*me["2p"])/2, (-9*rho**0.5*me["2p"])/2, -3*rho*me["2p"], -9*rho*me["2p"], -36*rho*me["2p"], -108*rho*me["2p"]),
+        ((me["5"] - rho*me["5"] - (1 + 2*rho)*me["6"] - 6*((-1 + rho)*me["7"] + me["8"] + 2*rho*me["8"]))/6, (me["5"] - rho*me["5"] - (1 + 2*rho)*me["6"])/2, (rho**0.5*(me["6"] + 6*me["8"]))/2, (3*rho**0.5*me["6"])/2, -(rho*(me["5"] + 6*me["7"]))/4, (-3*rho*me["5"])/4, -(rho**0.5*(me["5"] + 6*me["7"]))/8, (-3*rho**0.5*me["5"])/8, (rho**0.5*(me["5"] - 4*me["6"] + 6*(me["7"] - 4*me["8"])))/2, (3*rho**0.5*(me["5"] - 4*me["6"]))/2, (rho*(me["1p"] + 6*me["3p"]))/2, (3*rho*me["1p"])/2, -(rho**0.5*(me["2p"] + 6*me["4p"]))/2, (-3*rho**0.5*me["2p"])/2, ((-1 + rho)*me["1p"] + me["2p"] + 2*rho*me["2p"] + 6*((-1 + rho)*me["3p"] + me["4p"] + 2*rho*me["4p"]))/12, ((-1 + rho)*me["1p"] + me["2p"] + 2*rho*me["2p"])/4, -(rho**0.5*(me["1p"] - 2*(me["2p"] - 3*me["3p"] + 6*me["4p"])))/8, (-3*rho**0.5*(me["1p"] - 2*me["2p"]))/8, (rho**0.5*(me["1p"] + 2*(me["2p"] + 3*me["3p"] + 6*me["4p"])))/2, (3*rho**0.5*(me["1p"] + 2*me["2p"]))/2),
+        ((me["5"] - rho*me["5"] - (1 + 2*rho)*me["6"])/2, (-3*((-1 + rho)*me["5"] + me["6"] + 2*rho*me["6"]))/2, (3*rho**0.5*me["6"])/2, (9*rho**0.5*me["6"])/2, (-3*rho*me["5"])/4, (-9*rho*me["5"])/4, (-3*rho**0.5*me["5"])/8, (-9*rho**0.5*me["5"])/8, (3*rho**0.5*(me["5"] - 4*me["6"]))/2, (9*rho**0.5*(me["5"] - 4*me["6"]))/2, (3*rho*me["1p"])/2, (9*rho*me["1p"])/2, (-3*rho**0.5*me["2p"])/2, (-9*rho**0.5*me["2p"])/2, ((-1 + rho)*me["1p"] + me["2p"] + 2*rho*me["2p"])/4, (3*((-1 + rho)*me["1p"] + me["2p"] + 2*rho*me["2p"]))/4, (-3*rho**0.5*(me["1p"] - 2*me["2p"]))/8, (-9*rho**0.5*(me["1p"] - 2*me["2p"]))/8, (3*rho**0.5*(me["1p"] + 2*me["2p"]))/2, (9*rho**0.5*(me["1p"] + 2*me["2p"]))/2),
+        ((rho**0.5*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])))/4, (3*rho**0.5*(me["5"] - 2*me["6"]))/4, -((-1 + 2*rho)*(me["6"] + 6*me["8"]))/2, (1.5 - 3*rho)*me["6"], -(rho**0.5*(me["5"] + 6*me["7"]))/8, (-3*rho**0.5*me["5"])/8, -(rho*(me["5"] + 6*me["7"]))/4, (-3*rho*me["5"])/4, rho*(me["5"] - 4*me["6"] + 6*(me["7"] - 4*me["8"])), 3*rho*(me["5"] - 4*me["6"]), (rho**0.5*(me["1p"] + 6*me["3p"]))/4, (3*rho**0.5*me["1p"])/4, -(rho*(me["2p"] + 6*me["4p"])), -3*rho*me["2p"], -(rho**0.5*(me["1p"] - 2*(me["2p"] - 3*me["3p"] + 6*me["4p"])))/8, (-3*rho**0.5*(me["1p"] - 2*me["2p"]))/8, (-((1 + 2*rho)*me["1p"]) - 4*(-1 + rho)*me["2p"] - 6*(me["3p"] + 2*rho*me["3p"] + 4*(-1 + rho)*me["4p"]))/24, (-((1 + 2*rho)*me["1p"]) - 4*(-1 + rho)*me["2p"])/8, (me["1p"] + 2*rho*me["1p"] + (8 - 20*rho)*me["2p"] + 6*(me["3p"] + 2*rho*me["3p"] + 8*me["4p"] - 20*rho*me["4p"]))/6, (0.5 + rho)*me["1p"] + 2*(2 - 5*rho)*me["2p"]),
+        ((3*rho**0.5*(me["5"] - 2*me["6"]))/4, (9*rho**0.5*(me["5"] - 2*me["6"]))/4, (1.5 - 3*rho)*me["6"], (4.5 - 9*rho)*me["6"], (-3*rho**0.5*me["5"])/8, (-9*rho**0.5*me["5"])/8, (-3*rho*me["5"])/4, (-9*rho*me["5"])/4, 3*rho*(me["5"] - 4*me["6"]), 9*rho*(me["5"] - 4*me["6"]), (3*rho**0.5*me["1p"])/4, (9*rho**0.5*me["1p"])/4, -3*rho*me["2p"], -9*rho*me["2p"], (-3*rho**0.5*(me["1p"] - 2*me["2p"]))/8, (-9*rho**0.5*(me["1p"] - 2*me["2p"]))/8, (-((1 + 2*rho)*me["1p"]) - 4*(-1 + rho)*me["2p"])/8, (-3*(me["1p"] + 2*rho*me["1p"] + 4*(-1 + rho)*me["2p"]))/8, (0.5 + rho)*me["1p"] + 2*(2 - 5*rho)*me["2p"], (3*(me["1p"] + 2*rho*me["1p"] + 4*(2 - 5*rho)*me["2p"]))/2),
+        (-(rho**0.5*(me["5"] + 2*(me["6"] + 3*me["7"] + 6*me["8"]))), -3*rho**0.5*(me["5"] + 2*me["6"]), -6*(-1 + 2*rho)*(me["6"] + 6*me["8"]), -18*(-1 + 2*rho)*me["6"], (rho**0.5*(me["5"] - 4*me["6"] + 6*(me["7"] - 4*me["8"])))/2, (3*rho**0.5*(me["5"] - 4*me["6"]))/2, rho*(me["5"] - 4*me["6"] + 6*(me["7"] - 4*me["8"])), 3*rho*(me["5"] - 4*me["6"]), -4*rho*(me["5"] + 8*me["6"] + 6*(me["7"] + 8*me["8"])), -12*rho*(me["5"] + 8*me["6"]), -(rho**0.5*(me["1p"] - 4*me["2p"] + 6*(me["3p"] - 4*me["4p"]))), -3*rho**0.5*(me["1p"] - 4*me["2p"]), -12*rho*(me["2p"] + 6*me["4p"]), -36*rho*me["2p"], (rho**0.5*(me["1p"] + 2*(me["2p"] + 3*me["3p"] + 6*me["4p"])))/2, (3*rho**0.5*(me["1p"] + 2*me["2p"]))/2, (me["1p"] + 2*rho*me["1p"] + (8 - 20*rho)*me["2p"] + 6*(me["3p"] + 2*rho*me["3p"] + 8*me["4p"] - 20*rho*me["4p"]))/6, (0.5 + rho)*me["1p"] + 2*(2 - 5*rho)*me["2p"], (-2*(me["1p"] + 2*rho*me["1p"] + 4*(-7 + 13*rho)*me["2p"] + 6*(me["3p"] + 2*rho*me["3p"] - 28*me["4p"] + 52*rho*me["4p"])))/3, -2*(me["1p"] + 2*rho*me["1p"] + 4*(-7 + 13*rho)*me["2p"])),
+        (-3*rho**0.5*(me["5"] + 2*me["6"]), -9*rho**0.5*(me["5"] + 2*me["6"]), -18*(-1 + 2*rho)*me["6"], -54*(-1 + 2*rho)*me["6"], (3*rho**0.5*(me["5"] - 4*me["6"]))/2, (9*rho**0.5*(me["5"] - 4*me["6"]))/2, 3*rho*(me["5"] - 4*me["6"]), 9*rho*(me["5"] - 4*me["6"]), -12*rho*(me["5"] + 8*me["6"]), -36*rho*(me["5"] + 8*me["6"]), -3*rho**0.5*(me["1p"] - 4*me["2p"]), -9*rho**0.5*(me["1p"] - 4*me["2p"]), -36*rho*me["2p"], -108*rho*me["2p"], (3*rho**0.5*(me["1p"] + 2*me["2p"]))/2, (9*rho**0.5*(me["1p"] + 2*me["2p"]))/2, (0.5 + rho)*me["1p"] + 2*(2 - 5*rho)*me["2p"], (3*(me["1p"] + 2*rho*me["1p"] + 4*(2 - 5*rho)*me["2p"]))/2, -2*(me["1p"] + 2*rho*me["1p"] + 4*(-7 + 13*rho)*me["2p"]), -6*(me["1p"] + 2*rho*me["1p"] + 4*(-7 + 13*rho)*me["2p"]))
+    ))
 
+    dflav = {'d': 0, 's': 1, 'b': 2}
+    uflav = {'u': 0, 'c': 1, 't': 2}
+    result = 0
+    for sector in ("dbcu", "dbcc"):
+        CSM, CNP = siegen_basis_wcs(wc_obj, par, sector)
+        C = CSM + CNP
+        ckm_factor = V[uflav[sector[3]], dflav[sector[0]]] * V[uflav[sector[2]], dflav[sector[1]]] # Vud Vcb or Vcd Vcb
+        if sector == "dbcu":
+            phase_space = (1 - rho)**2
+            A_WE = A_WE_cu
+        elif sector == "dbcc":
+            phase_space = (1 - 4*rho)**0.5
+            A_WE = A_WE_cc
+        prefactor = GF**2 * mb**2 * abs(ckm_factor)**2 * phase_space / (6 * pi)
+
+        # While this term is manifestly real, we take take the real part to avoid
+        # tiny imaginary parts from floating point errors
+        result += prefactor * (C @ A_WE @ C.conj() - CSM @ A_WE @ CSM.conj()).real
+
+    return result
 
 
 def pauli_interference(wc_obj, par, meson):
@@ -202,6 +241,7 @@ def pauli_interference(wc_obj, par, meson):
     me = lifetimematrixelements(par, meson, config["renormalization scale"]["b lifetime ratios"])
     # Matrix for Pauli interference contributions with down and strange quark in the loop are the same
     flavio.citations.register("Lenz:2022pgw")
+    # See eqs 2.22 - 2.27 in Lenz:2022pgw
     A_PI_cd = np.array((
         (me["1"] + 6*me["3"],3*me["1"],-(rho**0.5*(me["1"] + 6*me["3"]))/2,(-3*rho**0.5*me["1"])/2,-(rho**0.5*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])))/4,(-3*rho**0.5*(me["5"] - 2*me["6"]))/4,(-me["5"] + 2*(me["6"] - 3*me["7"] + 6*me["8"]))/4,(-3*(me["5"] - 2*me["6"]))/4,3*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])),9*(me["5"] - 2*me["6"]),0,0,0,0,0,0,0,0,0,0),
         (3*me["1"],me["1"] + 6*me["3"],(-3*rho**0.5*me["1"])/2,-(rho**0.5*(me["1"] + 6*me["3"]))/2,(-3*rho**0.5*(me["5"] - 2*me["6"]))/4,-(rho**0.5*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])))/4,(-3*(me["5"] - 2*me["6"]))/4,(-me["5"] + 2*(me["6"] - 3*me["7"] + 6*me["8"]))/4,9*(me["5"] - 2*me["6"]),3*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])),0,0,0,0,0,0,0,0,0,0),
@@ -225,8 +265,8 @@ def pauli_interference(wc_obj, par, meson):
         (0,0,0,0,0,0,0,0,0,0,9*(me["5"] - 2*me["6"]),3*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])),-6*rho**0.5*(me["5"] - me["6"]),-2*rho**0.5*(me["5"] - me["6"] + 6*me["7"] - 6*me["8"]),(-3*rho**0.5*(me["1"] + 2*me["2"]))/2,-(rho**0.5*(me["1"] + 2*(me["2"] + 3*me["3"] + 6*me["4"])))/2,((-4 + rho)*me["1"])/2 - (1 + 2*rho)*me["2"],((-4 + rho)*me["1"] - 2*(me["2"] + 2*rho*me["2"] - 3*(-4 + rho)*me["3"] + 6*(me["4"] + 2*rho*me["4"])))/6,2*(14 + rho)*me["1"] - 4*(me["2"] + 2*rho*me["2"]),(2*((14 + rho)*me["1"] - 2*(me["2"] + 2*rho*me["2"] - 3*(14 + rho)*me["3"] + 6*(me["4"] + 2*rho*me["4"]))))/3)
     ))
 
-    result = 0
     dflav = {'d': 0, 's': 1, 'b': 2}
+    result = 0
     for sector in ("dbcu", "sbcu"):
         CSM, CNP = siegen_basis_wcs(wc_obj, par, sector)
         C = CSM + CNP
