@@ -172,20 +172,19 @@ DeltaGamma/Gamma_Bs: 0.129(9) # HFAG Summer 2016
 
 
 # Meson lifetime bag parameters
-
 # Result from Table 7 of 2208.02643
 bag_lifetime_B1qtilde: 1.0026+0.0198-0.0106
 bag_lifetime_B2qtilde: 0.9982+0.0052-0.0066
 bag_lifetime_B3qtilde: -0.0165+0.0209-0.0346
 bag_lifetime_B4qtilde: -0.0004+0.0200-0.0326
-bag_lifetime_B5qtilde: -1 +- 0.1 # These errors are inflated guesstimates by M Kirk
-bag_lifetime_B6qtilde: -1 +- 0.1 # These errors are inflated guesstimates by M Kirk
-bag_lifetime_B7qtilde: 0 +- 0.1 # These errors are inflated guesstimates by M Kirk
-bag_lifetime_B8qtilde: 0 +- 0.1 # These errors are inflated guesstimates by M Kirk
-bag_lifetime_deltaqq1tilde: 0.0026+0.0142-0.0092
-bag_lifetime_deltaqq2tilde: -0.0018+0.0047-0.0072
-bag_lifetime_deltaqq3tilde: -0.0004+0.0015-0.0024
-bag_lifetime_deltaqq4tilde: 0.0003+0.0012-0.0008
+bag_lifetime_B5qtilde: -1 +- 0.1 # These values and errors are guesstimates by M Kirk
+bag_lifetime_B6qtilde: -1 +- 0.1 # These values and errors are guesstimates by M Kirk
+bag_lifetime_B7qtilde:  0 +- 0.1 # These values and errors are guesstimates by M Kirk
+bag_lifetime_B8qtilde:  0 +- 0.1 # These values and errors are guesstimates by M Kirk
+bag_lifetime_delta^ud_1tilde: 0.0026+0.0142-0.0092
+bag_lifetime_delta^ud_2tilde: -0.0018+0.0047-0.0072
+bag_lifetime_delta^ud_3tilde: -0.0004+0.0015-0.0024
+bag_lifetime_delta^ud_4tilde: 0.0003+0.0012-0.0008
 
 
 # B->D* form factors

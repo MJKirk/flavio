@@ -26,10 +26,10 @@ def run_lifetime_bag_parameters(par, scale):
     B6qtilde_0 = par["bag_lifetime_B6qtilde"]
     B7qtilde_0 = par["bag_lifetime_B7qtilde"]
     B8qtilde_0 = par["bag_lifetime_B8qtilde"]
-    deltaqq1tilde_0 = par["bag_lifetime_deltaqq1tilde"]
-    deltaqq2tilde_0 = par["bag_lifetime_deltaqq2tilde"]
-    deltaqq3tilde_0 = par["bag_lifetime_deltaqq3tilde"]
-    deltaqq4tilde_0 = par["bag_lifetime_deltaqq4tilde"]
+    deltaqq1tilde_0 = par["bag_lifetime_delta^ud_1tilde"]
+    deltaqq2tilde_0 = par["bag_lifetime_delta^ud_2tilde"]
+    deltaqq3tilde_0 = par["bag_lifetime_delta^ud_3tilde"]
+    deltaqq4tilde_0 = par["bag_lifetime_delta^ud_4tilde"]
 
     # We only evolve the SM bag parameters B1-4, matching what is done in 2208.02643
     gamma_0_D = np.array((8,8,-1,-1))
