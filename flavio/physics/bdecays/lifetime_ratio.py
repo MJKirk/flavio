@@ -149,10 +149,10 @@ def weak_exchange(wc_obj, par, meson):
     mc = par["m_c"]
     rho = mc**2 / mb**2
     V = ckm.get_ckm(par)
-
     me = lifetimematrixelements(par, meson, config["renormalization scale"]["b lifetime ratios"])
-    flavio.citations.register("Lenz:2022pgw")
+
     # See eqs 2.28 - 2.33 in Lenz:2022pgw
+    flavio.citations.register("Lenz:2022pgw")
     A_WE_cu = np.array((
         ((-((2 + rho)*me["1"]) + 2*(me["2"] + 2*rho*me["2"] - 3*(2 + rho)*me["3"] + 6*(me["4"] + 2*rho*me["4"])))/6,-((2 + rho)*me["1"])/2 + me["2"] + 2*rho*me["2"],-(rho**0.5*(me["2"] + 6*me["4"])),-3*rho**0.5*me["2"],0,0,0,0,0,0,0,0,0,0,((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"] - 3*(2 + rho)*me["7p"] + 6*(me["8p"] + 2*rho*me["8p"])))/12,((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"]))/4,(rho**0.5*(me["5p"] - 2*(me["6p"] - 3*me["7p"] + 6*me["8p"])))/4,(3*rho**0.5*(me["5p"] - 2*me["6p"]))/4,-(rho**0.5*(me["5p"] + 2*(me["6p"] + 3*me["7p"] + 6*me["8p"]))),-3*rho**0.5*(me["5p"] + 2*me["6p"])),
         (-((2 + rho)*me["1"])/2 + me["2"] + 2*rho*me["2"],(-3*(2 + rho)*me["1"])/2 + 3*(1 + 2*rho)*me["2"],-3*rho**0.5*me["2"],-9*rho**0.5*me["2"],0,0,0,0,0,0,0,0,0,0,((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"]))/4,(3*((2 + rho)*me["5p"] - 2*(me["6p"] + 2*rho*me["6p"])))/4,(3*rho**0.5*(me["5p"] - 2*me["6p"]))/4,(9*rho**0.5*(me["5p"] - 2*me["6p"]))/4,-3*rho**0.5*(me["5p"] + 2*me["6p"]),-9*rho**0.5*(me["5p"] + 2*me["6p"])),
@@ -176,9 +176,9 @@ def weak_exchange(wc_obj, par, meson):
         (-3*rho**0.5*(me["5"] + 2*me["6"]),-9*rho**0.5*(me["5"] + 2*me["6"]),18*me["6"],54*me["6"],0,0,0,0,0,0,0,0,0,0,(3*rho**0.5*(me["1p"] + 2*me["2p"]))/2,(9*rho**0.5*(me["1p"] + 2*me["2p"]))/2,(0.5 + rho)*me["1p"] - (-4 + rho)*me["2p"],(3*(me["1p"] + 2*rho*me["1p"] - 2*(-4 + rho)*me["2p"]))/2,-2*(1 + 2*rho)*me["1p"] + 4*(14 + rho)*me["2p"],-6*(me["1p"] + 2*rho*me["1p"] - 2*(14 + rho)*me["2p"]))
     ))
 
+    # See eqs A.2 - A.7 in Lenz:2022pgw, results originally calculated in Jager:2017gal and Jager:2019bgk
     flavio.citations.register("Jager:2017gal")
     flavio.citations.register("Jager:2019bgk")
-    # See eqs A.2 - A.7 in Lenz:2022pgw
     A_WE_cc = np.array((
         (((-1 + rho)*me["1"] + me["2"] + 2*rho*me["2"] + 6*((-1 + rho)*me["3"] + me["4"] + 2*rho*me["4"]))/3, (-1 + rho)*me["1"] + me["2"] + 2*rho*me["2"], -(rho**0.5*(me["2"] + 6*me["4"])), -3*rho**0.5*me["2"], (rho*(me["1"] + 6*me["3"]))/2, (3*rho*me["1"])/2, (rho**0.5*(me["1"] + 6*me["3"]))/4, (3*rho**0.5*me["1"])/4, -(rho**0.5*(me["1"] - 4*me["2"] + 6*(me["3"] - 4*me["4"]))), -3*rho**0.5*(me["1"] - 4*me["2"]), -(rho*(me["5p"] + 6*me["7p"])), -3*rho*me["5p"], rho**0.5*(me["6p"] + 6*me["8p"]), 3*rho**0.5*me["6p"], (me["5p"] - rho*me["5p"] - (1 + 2*rho)*me["6p"] - 6*((-1 + rho)*me["7p"] + me["8p"] + 2*rho*me["8p"]))/6, (me["5p"] - rho*me["5p"] - (1 + 2*rho)*me["6p"])/2, (rho**0.5*(me["5p"] - 2*(me["6p"] - 3*me["7p"] + 6*me["8p"])))/4, (3*rho**0.5*(me["5p"] - 2*me["6p"]))/4, -(rho**0.5*(me["5p"] + 2*(me["6p"] + 3*me["7p"] + 6*me["8p"]))), -3*rho**0.5*(me["5p"] + 2*me["6p"])),
         ((-1 + rho)*me["1"] + me["2"] + 2*rho*me["2"], 3*((-1 + rho)*me["1"] + me["2"] + 2*rho*me["2"]), -3*rho**0.5*me["2"], -9*rho**0.5*me["2"], (3*rho*me["1"])/2, (9*rho*me["1"])/2, (3*rho**0.5*me["1"])/4, (9*rho**0.5*me["1"])/4, -3*rho**0.5*(me["1"] - 4*me["2"]), -9*rho**0.5*(me["1"] - 4*me["2"]), -3*rho*me["5p"], -9*rho*me["5p"], 3*rho**0.5*me["6p"], 9*rho**0.5*me["6p"], (me["5p"] - rho*me["5p"] - (1 + 2*rho)*me["6p"])/2, (-3*((-1 + rho)*me["5p"] + me["6p"] + 2*rho*me["6p"]))/2, (3*rho**0.5*(me["5p"] - 2*me["6p"]))/4, (9*rho**0.5*(me["5p"] - 2*me["6p"]))/4, -3*rho**0.5*(me["5p"] + 2*me["6p"]), -9*rho**0.5*(me["5p"] + 2*me["6p"])),
@@ -224,24 +224,24 @@ def weak_exchange(wc_obj, par, meson):
     return result
 
 
+
 def pauli_interference(wc_obj, par, meson):
     r"""BSM Pauli interference contributions. For now, only from b->c ubar d
     (dbcu sector) and b->c ubar s (sbcu sector) operators."""
-    # For Bd, no PI from dbcu or sbcu sectors
+    # For Bd, no PI from our considered sectors
     if meson == "B0":
         return 0
-    # So now B+ case only: both dbcu and sbcu sectors contribute (with different CKM factors)
+    # So now B+ case only: only dbcu sector contributes
 
     GF = par["GF"]
     mb = flavio.physics.running.running.get_mb_KS(par, 1)
     mc = par["m_c"]
     rho = mc**2 / mb**2
     V = ckm.get_ckm(par)
-
     me = lifetimematrixelements(par, meson, config["renormalization scale"]["b lifetime ratios"])
-    # Matrix for Pauli interference contributions with down and strange quark in the loop are the same
-    flavio.citations.register("Lenz:2022pgw")
+
     # See eqs 2.22 - 2.27 in Lenz:2022pgw
+    flavio.citations.register("Lenz:2022pgw")
     A_PI_cd = np.array((
         (me["1"] + 6*me["3"],3*me["1"],-(rho**0.5*(me["1"] + 6*me["3"]))/2,(-3*rho**0.5*me["1"])/2,-(rho**0.5*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])))/4,(-3*rho**0.5*(me["5"] - 2*me["6"]))/4,(-me["5"] + 2*(me["6"] - 3*me["7"] + 6*me["8"]))/4,(-3*(me["5"] - 2*me["6"]))/4,3*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])),9*(me["5"] - 2*me["6"]),0,0,0,0,0,0,0,0,0,0),
         (3*me["1"],me["1"] + 6*me["3"],(-3*rho**0.5*me["1"])/2,-(rho**0.5*(me["1"] + 6*me["3"]))/2,(-3*rho**0.5*(me["5"] - 2*me["6"]))/4,-(rho**0.5*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])))/4,(-3*(me["5"] - 2*me["6"]))/4,(-me["5"] + 2*(me["6"] - 3*me["7"] + 6*me["8"]))/4,9*(me["5"] - 2*me["6"]),3*(me["5"] - 2*(me["6"] - 3*me["7"] + 6*me["8"])),0,0,0,0,0,0,0,0,0,0),

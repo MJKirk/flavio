@@ -9,6 +9,7 @@ wc_sm = flavio.WilsonCoefficients()
 class TestTauBpoBd(unittest.TestCase):
     def test_bag_params(self):
         flavio_bag_params = flavio.physics.bdecays.lifetime_ratio.run_lifetime_bag_parameters(par, 4.5)
+        # These are the results at 4.5 GeV directly from Maria Laura Piscopo
         MLP_results = {
             "bag_lifetime_B1qtilde": 1.0080976022,
             "bag_lifetime_B2qtilde": 1.0012180386,
