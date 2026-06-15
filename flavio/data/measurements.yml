@@ -8233,6 +8233,12 @@ FNAL g-2 combination:
   values:
     a_mu: 116592061(41) e-11
 
+FNAL g-2 combination 2025:
+  experiment: Muon g-2
+  inspire: Muong-2:2025xyk
+  values:
+    a_mu: 1165920715(145) e-12
+
 K+->pinunu E949 2009:
   experiment: 'E949'
   inspire: Artamonov:2009sz

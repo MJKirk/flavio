@@ -6,7 +6,7 @@ import numpy as np
 
 
 par = flavio.default_parameters.get_central_all()
-amu_SM = 116591810e-11
+amu_SM = 116592033e-11
 atau_SM = 117721e-8
 ae_SM = 0.00115965218157
 
