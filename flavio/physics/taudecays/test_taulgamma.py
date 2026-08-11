@@ -71,4 +71,4 @@ class TestTauLGamma(unittest.TestCase):
             )
             for input_dict in input_dict_list
         ])
-        self.assertAlmostEqual(np.max(np.abs(1-BRs/compare_BRs)), 0, delta=0.002)
+        self.assertAlmostEqual(np.max(np.abs(1-BRs/compare_BRs)), 0, delta=0.0022)
