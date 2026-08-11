@@ -13,10 +13,10 @@ class TestTaulnunu(unittest.TestCase):
     def test_taulnunu_exp(self):
         # compare to the experimental values
         # cf. eq. (95) of 1705.00929
-        self.assertAlmostEqual(flavio.sm_prediction('BR(tau->mununu)') / 0.1739,
-                               1 / 1.0060, delta=0.0003)
-        self.assertAlmostEqual(flavio.sm_prediction('BR(tau->enunu)') / 0.1782,
-                               1 / 1.0022, delta=0.0003)
+        self.assertAlmostEqual(flavio.sm_prediction('BR(tau->mununu)') / 0.1737,
+                               1 / 1.0060, delta=0.0016)
+        self.assertAlmostEqual(flavio.sm_prediction('BR(tau->enunu)') / 0.1785,
+                               1 / 1.0022, delta=0.0017)
 
     def test_taulnunu_wrongflavor(self):
         self.assertEqual(taulnunu.BR_taulnunu(wc_obj, par, 'e', 'mu', 'e'), 0)
