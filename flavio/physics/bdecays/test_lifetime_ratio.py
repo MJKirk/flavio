@@ -3,7 +3,14 @@ import flavio
 from flavio.physics.bdecays import lifetime_ratio
 import numpy as np
 
+# Fix B0 and B+ masses, and B+ lifetime to values used to generate test cases
+flavio.default_parameters.set_constraint("m_B0", 5.27966)
+flavio.default_parameters.set_constraint("m_B+", 5.27934)
+flavio.default_parameters.set_constraint("tau_B+", 2488800398208.0635)
 par = flavio.default_parameters.get_central_all()
+# par["m_B0"] = 5.27966
+# par["m_B+"] = 5.27934
+# par["tau_B+"] = 2488800398208.0635
 wc_sm = flavio.WilsonCoefficients()
 
 
